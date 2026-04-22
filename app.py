@@ -5,218 +5,243 @@ import joblib
 st.set_page_config(
     page_title="London House Price Predictor",
     page_icon="🏠",
-    layout="wide"
+    layout="centered"
 )
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .stApp {
-    background: #0a0a0f;
-    color: #f0ede8;
+    background: #f5f4f0;
+    color: #1a1a1a;
 }
 
-/* Hide default streamlit elements */
 #MainMenu, footer, header {visibility: hidden;}
+
 .block-container {
-    padding: 0 !important;
-    max-width: 100% !important;
+    padding: 48px 48px 80px !important;
+    max-width: 860px !important;
 }
 
-/* Hero section */
-.hero {
-    background: linear-gradient(135deg, #0a0a0f 0%, #12121e 50%, #0a0a0f 100%);
-    border-bottom: 1px solid rgba(212, 175, 95, 0.2);
-    padding: 60px 80px 50px;
-    position: relative;
-    overflow: hidden;
+/* Top bar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 64px;
 }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(212, 175, 95, 0.06) 0%, transparent 70%);
-    pointer-events: none;
+.topbar-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #1a1a1a;
 }
 
-.hero-tag {
-    display: inline-block;
+.topbar-badge {
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #d4af5f;
-    border: 1px solid rgba(212, 175, 95, 0.3);
-    padding: 6px 16px;
-    border-radius: 2px;
-    margin-bottom: 24px;
+    color: #888;
+    background: #ebebeb;
+    padding: 6px 14px;
+    border-radius: 100px;
+}
+
+/* Hero */
+.hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 16px;
 }
 
 .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(42px, 6vw, 72px);
-    font-weight: 900;
-    line-height: 1.05;
-    color: #f0ede8;
-    margin: 0 0 16px;
-    letter-spacing: -1px;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 7vw, 64px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: #1a1a1a;
+    margin: 0 0 24px;
 }
 
-.hero-title span {
-    color: #d4af5f;
+.hero-title em {
+    font-style: normal;
+    color: #2563eb;
 }
 
-.hero-subtitle {
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(240, 237, 232, 0.55);
-    max-width: 520px;
-    line-height: 1.7;
-    margin: 0;
+.hero-desc {
+    font-size: 15px;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.75;
+    max-width: 500px;
+    margin-bottom: 48px;
 }
 
-.hero-stats {
+/* Stats row */
+.stats-row {
     display: flex;
-    gap: 48px;
-    margin-top: 48px;
+    gap: 0;
+    margin-bottom: 64px;
+    border: 1px solid #e0dfd9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
 }
 
-.stat {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.stat-item {
+    flex: 1;
+    padding: 24px 28px;
+    border-right: 1px solid #e0dfd9;
 }
 
-.stat-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #d4af5f;
+.stat-item:last-child {
+    border-right: none;
 }
 
-.stat-label {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(240, 237, 232, 0.4);
+.stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #2563eb;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
 }
 
-/* Main content */
-.main-content {
-    padding: 60px 80px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    max-width: 1400px;
-}
-
-/* Section headers */
-.section-header {
+.stat-lbl {
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #d4af5f;
-    margin-bottom: 28px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(212, 175, 95, 0.15);
+    color: #aaa;
 }
 
-/* Result box */
-.result-box {
-    background: linear-gradient(135deg, rgba(212, 175, 95, 0.08), rgba(212, 175, 95, 0.03));
-    border: 1px solid rgba(212, 175, 95, 0.25);
-    border-radius: 4px;
-    padding: 40px;
-    text-align: center;
-    margin-top: 24px;
+/* Cards */
+.card {
+    background: white;
+    border: 1px solid #e0dfd9;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 16px;
 }
 
-.result-label {
+.card-title {
     font-size: 11px;
-    letter-spacing: 3px;
+    font-weight: 600;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(240, 237, 232, 0.45);
+    color: #aaa;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0eeea;
+}
+
+/* Result */
+.result-card {
+    background: #2563eb;
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+    margin-top: 16px;
+}
+
+.result-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
     margin-bottom: 12px;
 }
 
 .result-price {
-    font-family: 'Playfair Display', serif;
-    font-size: 52px;
-    font-weight: 900;
-    color: #d4af5f;
+    font-family: 'Syne', sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -2px;
     line-height: 1;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.result-note {
-    font-size: 12px;
-    color: rgba(240, 237, 232, 0.35);
-    font-weight: 300;
+.result-meta {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
 }
 
-/* Streamlit widget overrides */
-.stSelectbox > div > div {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px solid rgba(212, 175, 95, 0.2) !important;
-    border-radius: 3px !important;
-    color: #f0ede8 !important;
+/* Override Streamlit widgets */
+div[data-baseweb="select"] > div {
+    background: #f8f8f6 !important;
+    border: 1px solid #e0dfd9 !important;
+    border-radius: 10px !important;
+    color: #1a1a1a !important;
 }
 
 .stNumberInput > div > div > input {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px solid rgba(212, 175, 95, 0.2) !important;
-    border-radius: 3px !important;
-    color: #f0ede8 !important;
+    background: #f8f8f6 !important;
+    border: 1px solid #e0dfd9 !important;
+    border-radius: 10px !important;
+    color: #1a1a1a !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
-.stSlider > div > div > div > div {
-    background: #d4af5f !important;
-}
-
-label {
-    color: rgba(240, 237, 232, 0.7) !important;
+label, .stSelectbox label, .stNumberInput label {
+    color: #555 !important;
     font-size: 13px !important;
-    font-weight: 400 !important;
-    letter-spacing: 0.5px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.2px !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 .stButton > button {
-    background: #d4af5f !important;
-    color: #0a0a0f !important;
+    background: #1a1a1a !important;
+    color: white !important;
     border: none !important;
-    border-radius: 3px !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
-    padding: 14px 40px !important;
+    border-radius: 10px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    padding: 16px 40px !important;
     width: 100% !important;
     margin-top: 8px !important;
-    cursor: pointer !important;
-    transition: all 0.2s !important;
+    transition: background 0.2s !important;
 }
 
 .stButton > button:hover {
-    background: #e8c96e !important;
-    transform: translateY(-1px) !important;
+    background: #2563eb !important;
 }
 
-/* Divider */
-.divider {
-    height: 1px;
-    background: rgba(212, 175, 95, 0.1);
-    margin: 0 80px;
+/* Footer */
+.footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #e0dfd9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-left {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.footer-right {
+    font-size: 12px;
+    color: #aaa;
 }
 
 </style>
@@ -226,79 +251,99 @@ label {
 model = joblib.load('model.pkl')
 le = joblib.load('label_encoder.pkl')
 
-# Hero
+# Top bar
 st.markdown("""
-<div class="hero">
-    <div class="hero-tag">Machine Learning · London Property</div>
-    <h1 class="hero-title">London House<br><span>Price Predictor</span></h1>
-    <p class="hero-subtitle">Predict average property prices across London boroughs using a Random Forest model trained on real Land Registry and ONS data.</p>
-    <div class="hero-stats">
-        <div class="stat">
-            <span class="stat-value">0.990</span>
-            <span class="stat-label">R² Score</span>
-        </div>
-        <div class="stat">
-            <span class="stat-value">£8,312</span>
-            <span class="stat-label">Avg. Error</span>
-        </div>
-        <div class="stat">
-            <span class="stat-value">32</span>
-            <span class="stat-label">Boroughs</span>
-        </div>
-    </div>
+<div class="topbar">
+    <div class="topbar-logo">LHPP</div>
+    <div class="topbar-badge">Random Forest Model</div>
 </div>
-<div class="divider"></div>
 """, unsafe_allow_html=True)
 
-# Layout
-st.markdown("<div style='padding: 60px 80px 0;'>", unsafe_allow_html=True)
+# Hero
+st.markdown("""
+<div class="hero-eyebrow">London Property Intelligence</div>
+<h1 class="hero-title">Predict Any<br><em>Borough Price</em></h1>
+<p class="hero-desc">Enter borough characteristics below to generate an instant average house price prediction, powered by a model trained on real Land Registry and ONS data.</p>
 
-col1, col2 = st.columns([1, 1], gap="large")
+<div class="stats-row">
+    <div class="stat-item">
+        <div class="stat-num">0.990</div>
+        <div class="stat-lbl">R² Score</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">£8,312</div>
+        <div class="stat-lbl">Avg. Error</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">32</div>
+        <div class="stat-lbl">Boroughs</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">25yrs</div>
+        <div class="stat-lbl">of Data</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
+# Form card 1
+st.markdown('<div class="card"><div class="card-title">Borough & Time</div>', unsafe_allow_html=True)
+area = st.selectbox('Borough', sorted(le.classes_))
+year = st.slider('Year', min_value=2000, max_value=2030, value=2023)
+borough_flag = st.selectbox('Borough Type', [1, 0],
+                             format_func=lambda x: 'Official London Borough' if x == 1 else 'Outer Area')
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Form card 2
+st.markdown('<div class="card"><div class="card-title">Economy</div>', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 with col1:
-    st.markdown('<div class="section-header">Borough & Time</div>', unsafe_allow_html=True)
-    area = st.selectbox('Borough', sorted(le.classes_))
-    year = st.slider('Year', min_value=2000, max_value=2030, value=2023)
-    borough_flag = st.selectbox('Borough Type', [1, 0],
-                                 format_func=lambda x: 'Official London Borough' if x == 1 else 'Outer Area')
-
-    st.markdown('<div class="section-header" style="margin-top:32px;">Economy</div>', unsafe_allow_html=True)
     median_salary = st.number_input('Median Salary (£)', min_value=10000, max_value=100000, value=35000, step=500)
-    mean_salary = st.number_input('Mean Salary (£)', min_value=10000, max_value=100000, value=40000, step=500)
-    number_of_jobs = st.number_input('Number of Jobs', min_value=0, max_value=1000000, value=100000, step=1000)
-
 with col2:
-    st.markdown('<div class="section-header">Demographics & Activity</div>', unsafe_allow_html=True)
+    mean_salary = st.number_input('Mean Salary (£)', min_value=10000, max_value=100000, value=40000, step=500)
+number_of_jobs = st.number_input('Number of Jobs', min_value=0, max_value=1000000, value=100000, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Form card 3
+st.markdown('<div class="card"><div class="card-title">Demographics & Activity</div>', unsafe_allow_html=True)
+col3, col4 = st.columns(2)
+with col3:
     population_size = st.number_input('Population Size', min_value=0, max_value=1000000, value=250000, step=1000)
-    houses_sold = st.number_input('Houses Sold per Month', min_value=0, max_value=1000, value=100)
+    houses_sold = st.number_input('Houses Sold / Month', min_value=0, max_value=1000, value=100)
+with col4:
     no_of_crimes = st.number_input('Number of Crimes', min_value=0, max_value=10000, value=300)
     recycling_pct = st.number_input('Recycling %', min_value=0, max_value=100, value=25)
+st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-top: 32px;'>", unsafe_allow_html=True)
-    predict = st.button('Generate Prediction →')
-    st.markdown("</div>", unsafe_allow_html=True)
+# Predict button
+predict = st.button('Generate Prediction →')
 
-    if predict:
-        area_encoded = le.transform([area])[0]
-        input_data = pd.DataFrame([{
-            'year': year,
-            'median_salary': median_salary,
-            'mean_salary': mean_salary,
-            'borough_flag_x': borough_flag,
-            'area_encoded': area_encoded,
-            'houses_sold': houses_sold,
-            'no_of_crimes': no_of_crimes,
-            'population_size': population_size,
-            'number_of_jobs': number_of_jobs,
-            'recycling_pct': recycling_pct
-        }])
-        prediction = model.predict(input_data)[0]
-        st.markdown(f"""
-        <div class="result-box">
-            <div class="result-label">Predicted Average Price</div>
-            <div class="result-price">£{prediction:,.0f}</div>
-            <div class="result-note">{area.title()} · {year} · R² 0.990</div>
-        </div>
-        """, unsafe_allow_html=True)
+if predict:
+    area_encoded = le.transform([area])[0]
+    input_data = pd.DataFrame([{
+        'year': year,
+        'median_salary': median_salary,
+        'mean_salary': mean_salary,
+        'borough_flag_x': borough_flag,
+        'area_encoded': area_encoded,
+        'houses_sold': houses_sold,
+        'no_of_crimes': no_of_crimes,
+        'population_size': population_size,
+        'number_of_jobs': number_of_jobs,
+        'recycling_pct': recycling_pct
+    }])
+    prediction = model.predict(input_data)[0]
+    st.markdown(f"""
+    <div class="result-card">
+        <div class="result-eyebrow">Predicted Average Price</div>
+        <div class="result-price">£{prediction:,.0f}</div>
+        <div class="result-meta">{area.title()} &nbsp;·&nbsp; {year} &nbsp;·&nbsp; R² 0.990</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)
+# Footer
+st.markdown("""
+<div class="footer">
+    <div class="footer-left">Trained on London housing data 1995–2020</div>
+    <div class="footer-right">Random Forest · scikit-learn</div>
+</div>
+""", unsafe_allow_html=True)
