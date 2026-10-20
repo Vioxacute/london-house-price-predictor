@@ -2,7 +2,7 @@
 
 A machine learning web app that predicts average house prices across London boroughs using real historical data.
 
-🔗 **Live App:** [london-house-price-predictor.onrender.com](https://london-house-price-predictor.onrender.com)
+🔗 **Live App:** [london-house-price-predictor.onrender.com](https://london-house-price-predictor.onrender.com) (free hosting: the first load can take about a minute)
 
 ---
 
@@ -10,7 +10,7 @@ A machine learning web app that predicts average house prices across London boro
 
 This project uses a Random Forest regression model trained on real London housing data to predict average property prices by borough. Users can input borough characteristics such as salary, crime rate, and population to receive an instant price prediction.
 
-The model achieves an **R² score of 0.990** and a **Mean Absolute Error of £8,312** on unseen test data.
+Tested honestly, on years it never saw in training, it reaches **R² 0.68** (mean absolute error £80,105). A random train/test split had reported R² 0.99, and finding out why was the most useful part of the project: see [Model](#model).
 
 ---
 
@@ -50,9 +50,29 @@ The two datasets were merged on `area` and `year` to create a rich feature set f
 ## Model
 
 - **Algorithm:** Random Forest Regressor (100 estimators)
-- **Train/Test Split:** 80/20
-- **R² Score:** 0.990
-- **Mean Absolute Error:** £8,312
+- **Evaluation:** trained on 1995–2015, tested on 2016–2020. The app's model is then retrained on all years.
+
+| Evaluation | R² | Mean absolute error |
+|---|---|---|
+| **Time-based split** (test on 2016–2020) | **0.679** | **£80,105** |
+| Baseline: each area's last known (2015) price | 0.950 | £44,642 |
+| Random 80/20 split of monthly rows (misleading) | 0.990 | £8,312 |
+
+**Why the random split misleads.** The data is monthly, so a random split puts
+neighbouring months of the same borough in both the training and the test
+set. The model then only has to fill gaps between months it has already seen,
+which overstates its accuracy. Testing on later years shows how it does on
+genuinely new data.
+
+**What the honest test shows.** The model does *worse* than simply carrying
+each borough's 2015 price forward. Two reasons:
+
+- House prices change slowly, so last year's price is a very strong predictor.
+- A random forest cannot extrapolate: it never predicts above the prices it
+  saw in training, so it falls behind a rising market.
+
+A model that predicts price *growth* from the previous year's price would be
+the natural next step. That is why the app only offers years up to 2020.
 
 **Top predictive features:**
 1. Year
@@ -68,12 +88,13 @@ The two datasets were merged on `area` and `year` to create a rich feature set f
 ```
 london-house-price-predictor/
 │
-├── Data/
+├── data/
 │   ├── housing_in_london_monthly_variables.csv
 │   └── housing_in_london_yearly_variables.csv
 │
 ├── app.py              # Streamlit web app
-├── train.py            # Model training script
+├── train.py            # Model training and evaluation script
+├── metrics.json        # Evaluation results written by train.py
 ├── explore.ipynb       # Data exploration notebook
 ├── requirements.txt    # Dependencies
 └── render.yaml         # Render deployment config
@@ -111,6 +132,7 @@ streamlit run app.py
 - Cleaning and merging real-world datasets with missing values
 - Feature engineering and encoding categorical variables
 - Training and evaluating a Random Forest regression model
+- How a random split leaks information in time-series data, and why a time-based split and a simple baseline are needed
 - Building and deploying an interactive ML web app
 
 ---

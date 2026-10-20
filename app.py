@@ -267,12 +267,12 @@ st.markdown("""
 
 <div class="stats-row">
     <div class="stat-item">
-        <div class="stat-num">0.990</div>
-        <div class="stat-lbl">R² Score</div>
+        <div class="stat-num">0.68</div>
+        <div class="stat-lbl">R² · 2016–20 test</div>
     </div>
     <div class="stat-item">
-        <div class="stat-num">£8,312</div>
-        <div class="stat-lbl">Avg. Error</div>
+        <div class="stat-num">£80k</div>
+        <div class="stat-lbl">Avg. Error · 2016–20</div>
     </div>
     <div class="stat-item">
         <div class="stat-num">32</div>
@@ -288,7 +288,8 @@ st.markdown("""
 # Form card 1
 st.markdown('<div class="card"><div class="card-title">Borough & Time</div>', unsafe_allow_html=True)
 area = st.selectbox('Borough', sorted(le.classes_))
-year = st.slider('Year', min_value=2000, max_value=2030, value=2023)
+# The data ends in 2020 and a random forest cannot extrapolate beyond it
+year = st.slider('Year', min_value=1995, max_value=2020, value=2020)
 borough_flag = st.selectbox('Borough Type', [1, 0],
                              format_func=lambda x: 'Official London Borough' if x == 1 else 'Outer Area')
 st.markdown('</div>', unsafe_allow_html=True)
@@ -336,7 +337,7 @@ if predict:
     <div class="result-card">
         <div class="result-eyebrow">Predicted Average Price</div>
         <div class="result-price">£{prediction:,.0f}</div>
-        <div class="result-meta">{area.title()} &nbsp;·&nbsp; {year} &nbsp;·&nbsp; R² 0.990</div>
+        <div class="result-meta">{area.title()} &nbsp;·&nbsp; {year}</div>
     </div>
     """, unsafe_allow_html=True)
 

@@ -1,0 +1,14 @@
+{
+  "time_split_test_2016_onwards": {
+    "r2": 0.679,
+    "mae": 80105
+  },
+  "baseline_last_known_price": {
+    "r2": 0.95,
+    "mae": 44642
+  },
+  "random_split_overstated": {
+    "r2": 0.99,
+    "mae": 8312
+  }
+}
