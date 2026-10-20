@@ -267,14 +267,6 @@ st.markdown("""
 
 <div class="stats-row">
     <div class="stat-item">
-        <div class="stat-num">0.68</div>
-        <div class="stat-lbl">R² · 2016–20 test</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">£80k</div>
-        <div class="stat-lbl">Avg. Error · 2016–20</div>
-    </div>
-    <div class="stat-item">
         <div class="stat-num">32</div>
         <div class="stat-lbl">Boroughs</div>
     </div>
